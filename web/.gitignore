@@ -1,4 +1,4 @@
 node_modules
 build
-**/configs/*.tsx
-!**/configs/*.sample.tsx
+#**/configs/*.tsx
+#!**/configs/*.sample.tsx
