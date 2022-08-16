@@ -43,7 +43,7 @@ const MainMap = () => {
       setActiveAddButton(null)
     }
     window.addEventListener('mouseup', listener)
-    window.addEventListener('touchend', listener)
+    window.addEventListener('touchend', listener, {passive: false})
     return () => {
       window.removeEventListener('mouseup', listener)
       window.removeEventListener('touchend', listener)

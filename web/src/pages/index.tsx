@@ -1,5 +1,6 @@
 import MapView from '../components/MapView'
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
+import { apiKey } from "../configs/googlemap"
 
 
 const render = (status: Status) => {
@@ -8,7 +9,7 @@ const render = (status: Status) => {
 
 function Main() {
   return <Wrapper
-    apiKey="AIzaSyDlEsJrvF8GJE_L7ca8CovzFXaXnFEsteE"
+    apiKey={apiKey}
     render={render}
   >
     <MapView />

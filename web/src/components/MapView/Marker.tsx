@@ -1,6 +1,6 @@
-import {useState} from 'react'
+import { useRef, useEffect } from 'react'
 import styles from './styles.module.css'
-import {useMousePosContext} from '../../contexts/ActiveMousePos'
+import { useMousePosContext } from '../../contexts/ActiveMousePos'
 
 interface MainProps {
   isActive: boolean
@@ -12,6 +12,7 @@ const Marker = ({
   setMarkerActive,
 }:MainProps) => {
   const {setCurrPos} = useMousePosContext()
+  const linkMark = useRef(null);
 
   const setPosition = (e:MouseEvent) => {
     e.preventDefault()
@@ -29,8 +30,27 @@ const Marker = ({
     })
   }
 
+  useEffect( () => {
+    if(linkMark.current) {
+      linkMark.current.addEventListener('touchstart', (e:TouchEvent) => {
+        e.preventDefault()
+        window.addEventListener('touchmove', setPositionTouch, {passive: false})
+        setMarkerActive()
+        setCurrPos({
+          x: e.changedTouches[0].pageX,
+          y: e.changedTouches[0].pageY
+        })
+      }, {passive: false})
+      linkMark.current.addEventListener('touchend', (e:TouchEvent) => {
+        e.preventDefault()
+        window.removeEventListener('touchmove', setPositionTouch)
+      }, {passive: false})
+    }
+  }, [])
+
   return <a
     href="#"
+    ref={linkMark}
     className={
       [
         styles.Mark,
@@ -56,23 +76,6 @@ const Marker = ({
       (e: React.MouseEvent) => {
         e.preventDefault()
         window.removeEventListener('mousemove', setPosition)
-      }
-    }
-    onTouchStart={
-      (e: React.TouchEvent) => {
-        e.preventDefault()
-        window.addEventListener('touchmove', setPositionTouch)
-        setMarkerActive()
-        setCurrPos({
-          x: e.changedTouches[0].pageX,
-          y: e.changedTouches[0].pageY
-        })
-      }
-    }
-    onTouchEnd={
-      (e: React.TouchEvent) => {
-        e.preventDefault()
-        window.removeEventListener('touchmove', setPositionTouch)
       }
     }
   >
