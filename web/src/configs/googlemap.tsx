@@ -1,5 +1,0 @@
-const apiKey = ""
-
-export {
-  apiKey
-}
