@@ -1,4 +1,5 @@
 # Yuanjing React Demo
+Link to preview it: [https://google-map-demo-yuanjing.herokuapp.com/](https://google-map-demo-yuanjing.herokuapp.com/)
 
 ## Deployment:
 There are two subfolders under the repo root. Each of them is a web application, in order to deploy it ( to Heroku ). Follow below instruction:
