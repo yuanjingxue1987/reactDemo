@@ -16,6 +16,7 @@ const getLatLngKey = (latlng:LatLng) => latlng.lat.toString() + latlng.lng.toStr
 
 const MainMap = ({onCursorMove, triggerEdit, markers}: MainProps) => {
   const mapRef = useRef(null);
+  const [listMarkers, setListMarkers] = useState([]);
   const [map, setMap] = useState<google.maps.Map>(null);
 
   useEffect(() => {
@@ -41,34 +42,54 @@ const MainMap = ({onCursorMove, triggerEdit, markers}: MainProps) => {
   }, [])
 
   useEffect(() => {
-    if(map && markers.length) {
-      markers.forEach((m) => {
-        const marker = new google.maps.Marker({
-          position: m,
-          map,
-          title: 'test'
-        })
-        const infowindow = new google.maps.InfoWindow({
-          content: m.note ? `${m.note} <a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">edit</a>` : `<a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">add</a>`,
-        });
-        marker.addListener("click", () => {
-          infowindow.open({
-            anchor: marker,
-            map,
-            shouldFocus: false,
-          });
-        });
-        google.maps.event.addListener(infowindow, 'domready', function() {
-          document.getElementById(`${getLatLngKey(m)}edit`).addEventListener(
-            'click',
-            (e:MouseEvent) => {
-              e.preventDefault()
-              infowindow.close()
-              triggerEdit(getLatLngKey(m))
-            }
-          );
-        });
+    let existingMarkers = {}
+    if(listMarkers.length) {
+      listMarkers.forEach(m => {
+        existingMarkers[m.key] = m
       })
+    }
+    if(map && markers.length) {
+      setListMarkers(
+        markers.map((m) => {
+          const key = getLatLngKey(m)
+          let marker:google.maps.Marker;
+          let infowindow:google.maps.InfoWindow;
+          if(existingMarkers[key]) {
+            marker = existingMarkers[key].marker
+            infowindow = existingMarkers[key].infowindow
+            infowindow.setContent(m.note ? `${m.note} <a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">edit</a>` : `<a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">add</a>`)
+          } else {
+            marker = new google.maps.Marker({
+              position: m,
+              map
+            })
+            infowindow = new google.maps.InfoWindow({
+              content: m.note ? `${m.note} <a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">edit</a>` : `<a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">add</a>`,
+            });
+            marker.addListener("click", () => {
+              infowindow.open({
+                anchor: marker,
+                map,
+                shouldFocus: false,
+              });
+            });
+            google.maps.event.addListener(infowindow, 'domready', function() {
+              document.getElementById(`${getLatLngKey(m)}edit`).addEventListener(
+                'click',
+                (e:MouseEvent) => {
+                  e.preventDefault()
+                  triggerEdit(getLatLngKey(m))
+                }
+              );
+            });
+          }
+          return {
+            marker,
+            infowindow,
+            key
+          }
+        })
+      )
     }
   }, [markers])
 
