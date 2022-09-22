@@ -57,14 +57,14 @@ const MainMap = forwardRef(
             if(existingMarkers[key]) {
               marker = existingMarkers[key].marker
               infowindow = existingMarkers[key].infowindow
-              infowindow.setContent(m.note ? `${m.note} <a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">edit</a>` : `<a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">add</a>`)
+              infowindow.setContent(m.note ? `<p class="${styles.textNote}">${m.note} <a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">edit</a></p>` : `<p class="${styles.textNote}"><a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">add</a></p>`)
             } else {
               marker = new google.maps.Marker({
                 position: m,
                 map
               })
               infowindow = new google.maps.InfoWindow({
-                content: m.note ? `${m.note} <a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">edit</a>` : `<a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">add</a>`,
+                content: m.note ? `<p class="${styles.textNote}">${m.note} <a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">edit</a></p>` : `<p class="${styles.textNote}"><a style="color: #1a73e8; text-decoration: underline;" id="${getLatLngKey(m)}edit"class="link-edit">add</a></p>`,
               });
               marker.addListener("click", () => {
                 infowindow.open({

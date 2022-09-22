@@ -94,9 +94,10 @@
 }
 
 .InfoModal :global(.area-info) {
-  padding: 48px 36px;
+  padding: 36px 16px;
   border-radius: 32px;
   border: 5px solid #ddd;
+  width: 80%;
   background: #fff; 
 }
 .InfoModal :global(.area-info) p {
@@ -105,8 +106,10 @@
 }
 .InfoModal :global(.area-info) textarea {
   width: 100%;
-  min-width: 360px;
   height: 120px;
+}
+.InfoModal :global(.area-info) textarea:focus {
+  font-size: 16px!important
 }
 .InfoModal :global(.area-info .area-btns) {
   display: flex;
@@ -123,4 +126,8 @@
 .InfoModal :global(.area-info .btn-save) {
   background: #1a73e8;
   color: #fff;
+}
+
+.textNote {
+  padding: 8px 16px;
 }

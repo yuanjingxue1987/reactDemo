@@ -19,8 +19,8 @@ const MainAnchor = ({isActive, posAdjustment}: MainProps) => {
     <span
       className={styles.AnchorMarker}
       style={{
-        top: pos.y - posAdjustment.y,
-        left: pos.x - posAdjustment.x
+        top: pos.y - posAdjustment.y - window.scrollY,
+        left: pos.x - posAdjustment.x - window.scrollX
       }}
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="5.6444445mm" height="9.847393mm" viewBox="0 0 20 34.892337" id="svg3455" version="1.1">
