@@ -3,11 +3,15 @@ import { useMousePosContext } from '../../contexts/ActiveMousePos'
 import styles from './styles.module.css'
 
 interface MainProps {
-  isActive: boolean
+  isActive: boolean,
+  posAdjustment: {
+    x: number,
+    y: number
+  }
 }
 
 
-const MainAnchor = ({isActive}: MainProps) => {
+const MainAnchor = ({isActive, posAdjustment}: MainProps) => {
   const contextPos = useMousePosContext()
   const pos = contextPos.data
 
@@ -15,8 +19,8 @@ const MainAnchor = ({isActive}: MainProps) => {
     <span
       className={styles.AnchorMarker}
       style={{
-        top: pos.y,
-        left: pos.x
+        top: pos.y - posAdjustment.y,
+        left: pos.x - posAdjustment.x
       }}
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="5.6444445mm" height="9.847393mm" viewBox="0 0 20 34.892337" id="svg3455" version="1.1">

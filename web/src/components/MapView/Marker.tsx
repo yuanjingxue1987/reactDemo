@@ -5,11 +5,13 @@ import { useMousePosContext } from '../../contexts/ActiveMousePos'
 interface MainProps {
   isActive: boolean
   setMarkerActive: () => void
+  onAddMarker: (x:number, y:number) => void
 }
 
 const Marker = ({
   isActive,
   setMarkerActive,
+  onAddMarker
 }:MainProps) => {
   const {setCurrPos} = useMousePosContext()
   const linkMark = useRef(null);
@@ -30,8 +32,25 @@ const Marker = ({
     })
   }
 
+  const addMarker = (e:MouseEvent) => {
+    e.preventDefault()
+    onAddMarker(e.clientX, e.clientY)
+    window.removeEventListener('mouseMove', setPosition)
+    window.removeEventListener('mouseup', addMarker)
+  }
+
   useEffect( () => {
     if(linkMark.current) {
+      linkMark.current.addEventListener('mousedown', (e:MouseEvent) => {
+        e.preventDefault()
+        window.addEventListener('mousemove', setPosition)
+        setMarkerActive()
+        setCurrPos({
+          x: e.pageX,
+          y: e.pageY
+        })
+        window.addEventListener('mouseup', addMarker)
+      })
       linkMark.current.addEventListener('touchstart', (e:TouchEvent) => {
         e.preventDefault()
         window.addEventListener('touchmove', setPositionTouch, {passive: false})
@@ -43,6 +62,8 @@ const Marker = ({
       }, {passive: false})
       linkMark.current.addEventListener('touchend', (e:TouchEvent) => {
         e.preventDefault()
+        const touch = e.changedTouches[0]
+        onAddMarker(touch.clientX, touch.clientY)
         window.removeEventListener('touchmove', setPositionTouch)
       }, {passive: false})
     }
@@ -64,12 +85,7 @@ const Marker = ({
     onMouseDown={
       (e: React.MouseEvent) => {
         e.preventDefault()
-        window.addEventListener('mousemove', setPosition)
         setMarkerActive()
-        setCurrPos({
-          x: e.pageX,
-          y: e.pageY
-        })
       }
     }
     onMouseUp={

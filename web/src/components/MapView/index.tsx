@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { LatLng } from '../../interfaces/Map'
 import Map from './Map'
 import {MousePosProvider} from '../../contexts/ActiveMousePos'
@@ -22,11 +22,12 @@ const mobileAndTabletCheck = function() {
 };
 
 const MainMap = () => {
-  const [currCursorLatLng, setCurrCursorLatLng] = useState(null)
   const [activeAddButton, setActiveAddButton] = useState(null)
   const [activeMarker, setActiveMarker] = useState(null)
   const [markers, setMarkers] = useState([])
   const [mapNotes, setMapNotes] = useState({})
+  const mapItem = useRef(null)
+
   const markerButtons = [
     {
       key: "1",
@@ -42,32 +43,33 @@ const MainMap = () => {
     }
   ]
 
-  useEffect(() => {
-    const listener = () => {
-      if(activeAddButton && currCursorLatLng) {
-        setMarkers([
-          ...markers,
-          currCursorLatLng
-        ])
-        setActiveMarker(getLatLngKey(currCursorLatLng))
-      }
+  const addMarker = (x:number, y:number) => {
+    if(mapItem.current && mapItem.current.map && mapItem.current.mapContainer) {
+      const bounds = mapItem.current.map.getBounds()
+      const ne = bounds.getNorthEast()
+      const sw = bounds.getSouthWest()
+      const latRange = sw.lat() - ne.lat()
+      const lngRange = ne.lng() - sw.lng()
+      const latMarker = ne.lat() + latRange * (y - mapItem.current.mapContainer.getBoundingClientRect().top) / mapItem.current.mapContainer.offsetHeight
+      const lngMarker = sw.lng() + lngRange * (x - mapItem.current.mapContainer.getBoundingClientRect().left) / mapItem.current.mapContainer.offsetWidth
+      setMarkers([
+        ...markers,
+        {
+          lat: latMarker,
+          lng: lngMarker
+        }
+      ])
       setActiveAddButton(null)
     }
-    window.addEventListener('mouseup', listener)
-    window.addEventListener('touchend', listener, {passive: false})
-    return () => {
-      window.removeEventListener('mouseup', listener)
-      window.removeEventListener('touchend', listener)
-    }
-  }, [currCursorLatLng, activeAddButton])
+  }
 
   return <MousePosProvider>
     <div
       className={styles.MapContainer}
-      style={mobileAndTabletCheck() ? {
-        width: window.innerWidth + 'px',
-        height: window.innerHeight + 'px'
-      } : {}}
+      //style={mobileAndTabletCheck() ? {
+        //width: window.innerWidth + 'px',
+        //height: window.innerHeight + 'px'
+      //} : {}}
     >
       <ul className = {styles.Sidebar}>
         {
@@ -77,14 +79,12 @@ const MainMap = () => {
               setMarkerActive={() => {
                 setActiveAddButton(m.key)
               }}
+              onAddMarker={addMarker}
             />
           </li>)
         }
       </ul>
       <Map
-        onCursorMove={(latLng: LatLng | null) => {
-          setCurrCursorLatLng(latLng)
-        }}
         triggerEdit={
           (key) => setActiveMarker(key)
         }
@@ -94,8 +94,20 @@ const MainMap = () => {
             note: mapNotes[getLatLngKey(m) || '']
           })
         )}
+        ref={mapItem}
       />
-      <Anchor isActive={!!activeAddButton} />
+      <Anchor
+        isActive={!!activeAddButton}
+        posAdjustment={(
+          mapItem.current && mapItem.current.mapContainer
+        ) ? {
+          x: mapItem.current.mapContainer.getBoundingClientRect().left,
+          y: mapItem.current.mapContainer.getBoundingClientRect().top
+        }: {
+          x: 5,
+          y: 5
+        }}
+      />
       {
         activeMarker &&
         <ModalInfo
